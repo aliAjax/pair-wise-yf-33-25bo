@@ -18,8 +18,18 @@ python3 app.py --db satellite_scheduling.db
 - `POST /api/requests`：创建数据接收请求。
 - `POST /api/requests/{id}/schedule`、`/reschedule`：排程或重排被抢占请求。
 - `POST /api/schedules/{id}/start`、`/complete`、`/cancel`、`/preempt`：接收状态和紧急抢占。
+- `POST /api/schedules/{id}/reassign`：为维护期顶下的待复核任务另选窗口和天线，规则全部重新校验；通过后生成新排程并保留原记录。
 - `POST /api/visibility-windows/{id}/change`：窗口变化并返回受影响排程；已接收数据保留。
+- `GET /api/maintenance`、`GET /api/maintenance/{id}`：调度台查看维护期、逐项冲突及改派结果（`open_conflicts` 为仍待复核数）。
 - `GET /api/state`、`GET /api/schedules/{id}`：权限化状态查询。
+
+## 维护期冲突处置
+
+登记维护期（站级或天线级）时立即检查时间重叠的排程：
+
+- `scheduled`（已排）和 `receiving`（进行中）任务转为 `review`（待复核），请求同步转 `review`，原时段立即释放；每项冲突在响应和 `maintenance_conflicts` 中返回。
+- `received`（已接收）任务原样保留、数据不动。
+- 值班员对 `review` 排程调用 `reassign`：另选窗口、天线、时段和速率，重新检查维护、天气、可见窗口、截止时间、速率容量、设备占用、同星接收和租户配额；校验失败则保持待复核，通过则旧排程标记 `reassigned`（`superseded_by` 指向新排程）并新建 `scheduled` 行。
 
 ## 测试
 
