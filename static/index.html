@@ -1,3 +1,20 @@
 <!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>卫星地面站排程台</title>
-<style>body{font:15px system-ui;max-width:1100px;margin:40px auto;background:#eef5f7;padding:0 20px;color:#102a43}section{background:white;padding:20px;border-radius:12px;margin:16px 0;box-shadow:0 2px 12px #0001}pre{background:#071827;color:#67e8f9;padding:16px;border-radius:8px;overflow:auto}input,button{font:inherit;padding:8px;margin:4px}button{background:#0369a1;color:white;border:0;border-radius:6px}</style>
-<h1>卫星地面站排程台</h1><p>查看请求、接收排程与站点状态。写入使用 JSON API，身份由 X-User-Id、X-Role 和租户头提供。</p><section><input id="u" value="operator"><input id="r" value="operator"><button onclick="load()">刷新</button><pre id="o"></pre></section><script>async function load(){let x=await fetch('/api/state',{headers:{'X-User-Id':u.value,'X-Role':r.value}});o.textContent=JSON.stringify(await x.json(),null,2)}load()</script>
+<style>body{font:15px system-ui;max-width:1100px;margin:40px auto;background:#eef5f7;padding:0 20px;color:#102a43}section{background:white;padding:20px;border-radius:12px;margin:16px 0;box-shadow:0 2px 12px #0001}pre{background:#071827;color:#67e8f9;padding:16px;border-radius:8px;overflow:auto}input,button{font:inherit;padding:8px;margin:4px}button{background:#0369a1;color:white;border:0;border-radius:6px}.tag{display:inline-block;padding:2px 8px;border-radius:10px;background:#e0f2fe;margin:2px;font-size:13px}.review{background:#fef3c7}.superseded{background:#e2e8f0}.received{background:#dcfce7}</style>
+<h1>卫星地面站排程台</h1><p>查看请求、接收排程、维护期与改派结果。写入使用 JSON API，身份由 X-User-Id、X-Role 和租户头提供。</p>
+<section>
+  <input id="u" value="operator"><input id="r" value="operator">
+  <button onclick="load()">刷新状态</button><button onclick="loadM()">维护与改派结果</button>
+  <div id="legend">排程状态：<span class="tag">scheduled</span><span class="tag">receiving</span><span class="tag received">received</span><span class="tag review">review 待复核</span><span class="tag superseded">superseded 原记录</span></div>
+  <pre id="o"></pre>
+</section>
+<script>
+async function load(){
+  let x=await fetch('/api/state',{headers:{'X-User-Id':u.value,'X-Role':r.value}});
+  o.textContent=JSON.stringify(await x.json(),null,2);
+}
+async function loadM(){
+  let x=await fetch('/api/maintenance',{headers:{'X-User-Id':u.value,'X-Role':r.value}});
+  o.textContent=JSON.stringify(await x.json(),null,2);
+}
+load();
+</script>
